@@ -45,7 +45,7 @@ doc= read_doc(pdf_path)
 document_chunks= chunk_data(doc=doc)
 
 # to convert the chunks to embeddings
-# embeddings =  OpenAIEmbeddings(api_key='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')
+# embeddings =  OpenAIEmbeddings()
 # print(embeddings)
 
 embeddings = SpacyEmbeddings(model_name="en_core_web_sm")
