@@ -1,0 +1,13 @@
+prefix=/home/btcchl023/Desktop/vecDB/venv
+exec_prefix=/home/btcchl023/Desktop/vecDB/venv
+libdir=/home/btcchl023/Desktop/vecDB/venv/lib
+sharedlibdir=/home/btcchl023/Desktop/vecDB/venv/lib
+includedir=/home/btcchl023/Desktop/vecDB/venv/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.13
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}
