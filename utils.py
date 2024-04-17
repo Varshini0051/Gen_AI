@@ -3,7 +3,6 @@ import langchain
 import pinecone
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-# from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings import SpacyEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langchain_community.llms import openai
@@ -13,20 +12,19 @@ from dotenv import load_dotenv
 load_dotenv()
 
 pc = Pinecone(api_key= os.getenv('pinecone_api_key'))
-index_name= 'storydb'
-# if index_name not in pc.list_indexes().names():
-#     pc.create_index(
-#         name=index_name, 
-#         dimension=96, 
-#         metric='cosine',
-#         spec=ServerlessSpec(
-#             cloud='aws',
-#             region='us-west-2'
-#         )
-#     )
+index_name= 'sample'
+if index_name not in pc.list_indexes().names():
+    pc.create_index(
+        name=index_name, 
+        dimension=96, 
+        metric='cosine',
+        spec=ServerlessSpec(
+            cloud='aws',
+            region='us-west-2'
+        )
+    )
 index = pc.Index(index_name)
 
-# print(index.describe_index_stats())
 
 # to read the document
 def read_doc(directory):
@@ -45,14 +43,12 @@ doc= read_doc(pdf_path)
 document_chunks= chunk_data(doc=doc)
 
 # to convert the chunks to embeddings
-# print(embeddings)
-
 embeddings = SpacyEmbeddings(model_name="en_core_web_sm")
 
 # Convert chunks to vectors
 chunk_vectors = []
 for chunk in document_chunks:
-    chunk_text = chunk.page_content  # Extract text content from the chunk
+    chunk_text = chunk.page_content
     chunk_vectors.append(embeddings.embed_query(chunk_text))
 
 
@@ -61,9 +57,9 @@ index.upsert([(f"Chunk_{i}", vec) for i, vec in enumerate(chunk_vectors)])
 
 
 # Perform similarity search
-query = "knowledge and wisdom he had gained along the way, he set out to explore new worlds and "
+query = "Mysterious"
 query_vector = embeddings.embed_query(query)
-print(len(query_vector))
-similar_documents = index.query(vector=query_vector, top_k=5, namespace=index_name)
-print(similar_documents)
-# print(query_vector)
+similar_documents = index.query(vector=[query_vector], top_k=4)
+print("similar_documents",similar_documents)
+similar_id = similar_documents['matches'][0]['id']
+print("Similar ID:", similar_id)
