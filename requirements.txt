@@ -7,4 +7,3 @@ langchain
 pandas
 numpy
 python-dotenv
-ipykernel

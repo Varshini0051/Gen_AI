@@ -23,8 +23,7 @@ if index_name not in pc.list_indexes().names():
             region='us-west-2'
         )
     )
-index = pc.Index(index_name)
-
+index = pc.Index(host='https://sample-uj69pc1.svc.apw5-4e34-81fa.pinecone.io')
 
 # to read the document
 def read_doc(directory):
@@ -46,18 +45,20 @@ document_chunks= chunk_data(doc=doc)
 embeddings = SpacyEmbeddings(model_name="en_core_web_sm")
 
 # Convert chunks to vectors
-chunk_vectors = []
-for chunk in document_chunks:
-    chunk_text = chunk.page_content
-    chunk_vectors.append(embeddings.embed_query(chunk_text))
+chunk_data = []
 
+for i, chunk in enumerate(document_chunks):
+    chunk_text = chunk.page_content
+    chunk_metadata = chunk.metadata
+    chunk_vector = embeddings.embed_query(chunk_text)
+    
+    chunk_data.append((f"{i}", chunk_vector, chunk_metadata))
 
 # Insert vectors into the Pinecone index
-index.upsert([(f"Chunk_{i}", vec) for i, vec in enumerate(chunk_vectors)])
-
+index.upsert(chunk_data)
 
 # Perform similarity search
-query = "Mysterious"
+query = "Who is Jack"
 query_vector = embeddings.embed_query(query)
 similar_documents = index.query(vector=[query_vector], top_k=4)
 print("similar_documents",similar_documents)
