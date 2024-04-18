@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 pc = Pinecone(api_key= os.getenv('pinecone_api_key'))
-index_name= 'sample'
+index_name= 'story'
 if index_name not in pc.list_indexes().names():
     pc.create_index(
         name=index_name, 
@@ -37,7 +37,19 @@ def chunk_data(doc, chunk_size=800, chunk_overlap=50):
     document= text_splitter.split_documents(doc)
     return document
 
-pdf_path= 'document/sample.pdf'
+def similarity_search(query, k):
+    query_vector = embeddings.embed_query(query)
+    similar_documents = index.query(vector=[query_vector], top_k=k, include_metadata=True, include_values=False)
+    # print(similar_documents)
+    similar_id = similar_documents['matches'][0]['id']
+    # print("Similar ID:", similar_id)
+    return(similar_documents,similar_id)
+
+
+
+    
+pdf_path= 'document/story.pdf'
+document_name = os.path.basename(pdf_path)
 doc= read_doc(pdf_path)
 document_chunks= chunk_data(doc=doc)
 
@@ -50,6 +62,8 @@ chunk_data = []
 for i, chunk in enumerate(document_chunks):
     chunk_text = chunk.page_content
     chunk_metadata = chunk.metadata
+    chunk_metadata['text'] = chunk_text
+    chunk_metadata['source']= document_name
     chunk_vector = embeddings.embed_query(chunk_text)
     
     chunk_data.append((f"{i}", chunk_vector, chunk_metadata))
@@ -58,9 +72,6 @@ for i, chunk in enumerate(document_chunks):
 index.upsert(chunk_data)
 
 # Perform similarity search
-query = "Who is Jack"
-query_vector = embeddings.embed_query(query)
-similar_documents = index.query(vector=[query_vector], top_k=4)
-print("similar_documents",similar_documents)
-similar_id = similar_documents['matches'][0]['id']
-print("Similar ID:", similar_id)
+query = "puzzled the pirates"
+result= similarity_search(query,2)
+print(result)
