@@ -37,23 +37,19 @@ def chunk_data(doc, chunk_size=800, chunk_overlap=50):
     document= text_splitter.split_documents(doc)
     return document
 
+# to perform similarity search.
 def similarity_search(query, k):
     query_vector = embeddings.embed_query(query)
     similar_documents = index.query(vector=[query_vector], top_k=k, include_metadata=True, include_values=False)
-    # print(similar_documents)
     similar_id = similar_documents['matches'][0]['id']
-    # print("Similar ID:", similar_id)
     return(similar_documents,similar_id)
 
 
-
-    
 pdf_path= 'document/story.pdf'
 document_name = os.path.basename(pdf_path)
 doc= read_doc(pdf_path)
 document_chunks= chunk_data(doc=doc)
 
-# to convert the chunks to embeddings
 embeddings = SpacyEmbeddings(model_name="en_core_web_sm")
 
 # Convert chunks to vectors
