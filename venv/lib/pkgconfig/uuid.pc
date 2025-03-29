@@ -1,0 +1,11 @@
+prefix=/home/btcchl023/Desktop/vecDB/venv
+exec_prefix=/home/btcchl023/Desktop/vecDB/venv
+libdir=/home/btcchl023/Desktop/vecDB/venv/lib
+includedir=/home/btcchl023/Desktop/vecDB/venv/include
+
+Name: uuid
+Description: Universally unique id library
+Version: 2.32.1
+Requires:
+Cflags: -I${includedir}/uuid
+Libs: -L${libdir} -luuid
